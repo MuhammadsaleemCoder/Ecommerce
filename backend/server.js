@@ -8,6 +8,11 @@ app.use(cors());
 app.use(express.json());
 //connecting databse
 connectDB();
+
+app.get("/", (req, res) => {
+  res.send("Server is working");
+});
+
 app.listen(5001, () => {
   console.log("Server is working properly");
 });
