@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
+import userRouter from "./routes/auth.route.js";
 const app = express();
 dotenv.config();
 app.use(cors());
@@ -9,10 +10,12 @@ app.use(express.json());
 //connecting databse
 connectDB();
 
+app.use("/api/auth", userRouter);
+
 app.get("/", (req, res) => {
   res.send("Server is working");
 });
 
-app.listen(5001, () => {
+app.listen(5000, () => {
   console.log("Server is working properly");
 });
