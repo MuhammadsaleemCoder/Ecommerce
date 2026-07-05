@@ -18,6 +18,7 @@ function Login() {
     try {
       e.preventDefault();
       const response = await api.post("/auth/login", form);
+      localStorage.setItem("token", response.data.token);
       setMsg(response.data.message);
       navigate("/signup");
     } catch (error) {
