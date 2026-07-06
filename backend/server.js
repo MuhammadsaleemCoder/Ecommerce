@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import userRouter from "./routes/auth.route.js";
+import productRouter from "./routes/product.route.js";
 const app = express();
 dotenv.config();
 app.use(cors());
@@ -11,6 +12,7 @@ app.use(express.json());
 connectDB();
 
 app.use("/api/auth", userRouter);
+app.use("/api/products", productRouter);
 
 app.get("/", (req, res) => {
   res.send("Server is working");
