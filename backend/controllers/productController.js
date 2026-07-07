@@ -16,8 +16,18 @@ export const createProduct = async (req, res) => {
 
 export const getAllProduct = async (req, res) => {
   try {
-    const getProduct = await Product.find();
-    res.status(200).json({ message: "All product", getProduct });
+    const { search, category } = req.query;
+    let filter = {};
+    if (search) {
+      filter.title = { $regex: search, $options: "i" };
+    }
+    if (category) {
+      filter.category = { $regex: category, $options: "i" };
+    }
+    const getProduct = await Product.find(filter);
+    console.log(req.query);
+    console.log(filter);
+    res.status(200).json({ getProduct });
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
