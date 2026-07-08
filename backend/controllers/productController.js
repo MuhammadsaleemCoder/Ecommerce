@@ -78,3 +78,18 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 };
+
+export const detailProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const singleId = await Product.findById(id);
+    if (!singleId) {
+      res.status(404).json({ message: "Id does'nt exist" });
+    }
+    console.log("asd", id);
+
+    res.status(200).json({ message: "single id fetch", singleId });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};

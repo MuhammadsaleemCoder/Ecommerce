@@ -6,16 +6,19 @@ import SignUp from "./pages/SignUp.jsx";
 import AddProduct from "./admin/AddProduct.jsx";
 import ListProduct from "./admin/listProduct.jsx";
 import ProductId from "./admin/UpdateId.jsx";
+import SingleProduct from "./pages/SingleProduct.jsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <Home /> },
   { path: "/login", element: <Login /> },
-  { path: "/product/:id", element: <ProductDetails /> },
   { path: "/signup", element: <SignUp /> },
 
   { path: "/admin/products/add-product", element: <AddProduct /> },
   { path: "/admin/products/list", element: <ListProduct /> },
   { path: "/admin/products/update/:id", element: <ProductId /> },
+
+  //
+  { path: "/product/details/:id", element: <SingleProduct /> },
 ]);
 
 export default function App() {
