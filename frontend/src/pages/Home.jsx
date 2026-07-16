@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
-import React from "react";
-import api from "../api/axios.js";
+import api from "../api/axios";
 import { Link } from "react-router-dom";
 
 function Home() {
-  const [products, setProduct] = useState([]);
+  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
   const [msg, setMsg] = useState("");
+
   const productLoad = async () => {
     try {
-      const response = await api.get(
-        `products/all?search=${search}&category=${category}`,
+      const res = await api.get(
+        `/products/all?search=${search}&category=${category}`,
       );
-      setProduct(response.data.getProduct);
-      setMsg(response.data.message);
+
+      setProducts(res.data.getProduct);
     } catch (error) {
       setMsg(error.response.data.message);
     }
@@ -23,74 +23,81 @@ function Home() {
   useEffect(() => {
     productLoad();
   }, [search, category]);
+
+  const addToCart = async (productId) => {
+    try {
+      const userId = localStorage.getItem("userId");
+
+      if (!userId) {
+        alert("Please login first");
+        return;
+      }
+
+      const res = await api.post("/cart/add", {
+        userId,
+        productId,
+      });
+
+      const total = res.data.cart.items.reduce(
+        (sum, item) => sum + item.quantity,
+        0,
+      );
+
+      localStorage.setItem("cartCount", total);
+      window.dispatchEvent(new Event("cartUpdated"));
+
+      alert("Product added successfully");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
-    <div className="min-h-screen  p-6">
-      <nav className="fixed top-0 left-0 w-full bg-white shadow-md z-50 p-6 flex justify-between px-14">
-        <div className="w-1/8 ">
-          <Link to="/">Dashboard</Link>
-        </div>
-        <div className="w-1/5  "></div>
-        <div className=" w-100 flex gap-8">
-          <input
-            type="text"
-            className="w-150 rounded-2xl outline-amber-500 border border-gray-300 h-8 p-4 focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition  text-gray-700 shadow-sm outline-none "
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search Products...."
-          />
-          <div className="flex items-center gap-3">
-            <label className="text-gray-700 font-medium">Category:</label>
+    <div className="min-h-screen p-6">
+      <div className="flex flex-wrap justify-between gap-6 mt-10">
+        {products.map((product) => (
+          <div
+            key={product._id}
+            className="w-56 bg-white rounded-lg shadow-lg hover:shadow-xl"
+          >
+            <img
+              src={product.image}
+              alt={product.title}
+              className="w-full h-40 object-cover rounded-t-lg"
+            />
 
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-44 px-4 py-2 border border-gray-300 rounded-xl bg-white text-gray-700 shadow-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-200 transition"
-            >
-              <option value="">All Products</option>
-              <option value="mobile">📱 Mobile</option>
-              <option value="laptop">💻 Laptop</option>
-            </select>
-          </div>
-        </div>
-        <div>Logo</div>
-      </nav>
+            <div className="p-3">
+              <h2 className="text-xl font-bold">{product.title}</h2>
 
-      <div className=" w-full gap-6 flex flex-wrap justify-between p-10 mt-10 ">
-        {products.map((product) => {
-          return (
-            <div
-              key={product._id}
-              className="w-56 bg-white rounded-lg ml-0 shadow-lg hover:shadow-xl transition"
-            >
-              <img
-                src={product.image}
-                alt={product.title}
-                className="w-full h-40 object-cover rounded-lg"
-              />
-              <div className="p-3 h-12 overflow-hidden">
-                <h2 className="text-xl font-bold text-gray-800">
-                  {product.title}
-                </h2>
-              </div>
-              <div className="h-6 px-3 overflow-hidden">
-                <h2>{product.description}</h2>
-              </div>
-              <div className="flex justify-around items-center mb-4">
-                <span className="text-amber-600 text-xl font-bold">
+              <p className="text-sm text-gray-600 h-10 overflow-hidden">
+                {product.description}
+              </p>
+
+              <div className="flex justify-between items-center mt-3">
+                <span className="text-xl font-bold text-amber-600">
                   ₹{product.price}
                 </span>
-                <Link
-                  to={`/product/details/${product._id}`}
-                  className="p-3 mt-3 bg-amber-600 text-white py-2 rounded-lg hover:bg-amber-700"
-                >
-                  View Details
-                </Link>
               </div>
+
+              <Link
+                to={`/product/details/${product._id}`}
+                className="block text-center mt-3 bg-gray-700 text-white py-2 rounded-lg"
+              >
+                View Details
+              </Link>
+
+              <button
+                onClick={() => addToCart(product._id)}
+                className="w-full mt-2 bg-amber-600 text-white py-2 rounded-lg hover:bg-amber-700"
+              >
+                Add to Cart
+              </button>
             </div>
-          );
-        })}
+          </div>
+        ))}
       </div>
     </div>
   );
 }
+
 export default Home;
